@@ -11,6 +11,7 @@ it will be ran through the terminal/command prompt.
 For this program to run you will have to have python installed
 in your computer. However, if you use ubuntu python comes 
 already installed.
+Also you will need to install the pygame library from pygame.org
 
 How to run it:
 First go to your folder where search.py is in.
@@ -31,13 +32,28 @@ Possible classes
 	-bullets might only be a function or maybe a whole class
 
 """
-
+#import pygame
 from pygame import *
+import sys
+from random import shuffle
+from random import randrange, choice
 
-class MotherShip():
-	def bullets(): #not sure if this will work like this might need to make this a class.
+#// globals
+# // not done with this class 
+class StartGame(object):
+	def _init_(self):
+		self.screen = display.set_mode(800,600)
+		self.background = image.load('images/space.jpg').convert()
 
-class enemies():
 
-class biggerEnemies():
+class MotherShip(sprite.Sprite):
+	def update(self, keys, *args):
+		if keys[K_LEFT] and self.rect.x > 10:
+			self.rect.x -= self.speed
+		if keys[K_RIGHT] and self.rect.x < 750:
+			self.rect.x += self.speed
+#class enemies():
+
+#class biggerEnemies():
+
 
