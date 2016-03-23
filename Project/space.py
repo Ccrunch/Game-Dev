@@ -57,18 +57,31 @@ class MotherShip(sprite.Sprite):
 	def update(self, keys, *args):
 		if keys[K_LEFT] and self.rect.x > 10:
 			self.rect.x -= self.speed
-		if keys[K_RIGHT] and self.rect.x < 750:
+		if keys[K_RIGHT] and self.rect.x < 740:
 			self.rect.x += self.speed
 
 		game.screen.blit(self.image, self.rect)
 
+class Bullet(sprite.Sprite):
+	def __init__(self, xpos, ypos, direction, speed, filename, side):
+		sprite.Sprite.__init__(self)
+
+
+	def update(self, keys, *args):
+		game.screen.blit(self.image, self.rect)
+		self.rect.y += self.speed * self.direction
+		if self.rect.y < 15 or self.rect.y > 600:
+			self.kill()
+
 # // not done with this class 
 class StartGame(object):
 	def __init__(self):
-		self.screen = display.set_mode(800,600)
+		self.screen = SCREEN
 		self.background = image.load('images/space.jpg').convert()
+		self.startGame = False
+		self.mainScreen = True
+		self.gameOver = False
 #class enemies():
 
 #class biggerEnemies():
-
 
