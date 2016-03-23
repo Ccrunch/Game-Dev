@@ -39,19 +39,34 @@ from random import shuffle
 from random import randrange, choice
 
 #// globals
-# // not done with this class 
-class StartGame(object):
-	def _init_(self):
-		self.screen = display.set_mode(800,600)
-		self.background = image.load('images/space.jpg').convert()
+
+SCREEN = display.set_mode((800,600))
+PicName = ["motherShip"]
+pictures = {name: image.load("images/{}.png".format(name)).convert_alpha() for name in PicName}
+
+
 
 
 class MotherShip(sprite.Sprite):
+	def __init__(self):
+		sprite.Sprite.__init__(self)
+		self.image = pictures["motherShip"]
+		self.rect = self.image.get_rect(topleft=(375,540))
+		self.speed = 5
+
 	def update(self, keys, *args):
 		if keys[K_LEFT] and self.rect.x > 10:
 			self.rect.x -= self.speed
 		if keys[K_RIGHT] and self.rect.x < 750:
 			self.rect.x += self.speed
+
+		game.screen.blit(self.image, self.rect)
+
+# // not done with this class 
+class StartGame(object):
+	def __init__(self):
+		self.screen = display.set_mode(800,600)
+		self.background = image.load('images/space.jpg').convert()
 #class enemies():
 
 #class biggerEnemies():
