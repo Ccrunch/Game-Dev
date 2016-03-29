@@ -32,11 +32,9 @@ Possible classes
 	-bullets might only be a function or maybe a whole class
 
 """
-#import pygame
+import pygame
 from pygame import *
 import sys
-from random import shuffle
-from random import randrange, choice
 
 #// globals
 
@@ -65,6 +63,12 @@ class MotherShip(sprite.Sprite):
 class Bullet(sprite.Sprite):
 	def __init__(self, xpos, ypos, direction, speed, filename, side):
 		sprite.Sprite.__init__(self)
+		self.image = pictures[filename]
+		self.rect = self.image.get_rect(topleft=(xpos, ypos))
+		self.speed = speed
+		self.direction = direction
+		self.side = side
+		self.filename = filename
 
 
 	def update(self, keys, *args):
@@ -73,14 +77,44 @@ class Bullet(sprite.Sprite):
 		if self.rect.y < 15 or self.rect.y > 600:
 			self.kill()
 
+class block(sprite.Sprite):
+
+	def update(self, keys, *args):
+		game.screen.blit(self.image, self.rect)
+
 # // not done with this class 
 class StartGame(object):
 	def __init__(self):
+		#init()
 		self.screen = SCREEN
 		self.background = image.load('images/space.jpg').convert()
 		self.startGame = False
 		self.mainScreen = True
 		self.gameOver = False
+
+	def reset(self, score, lives):
+		self.player = MotherShip()
+
+	def main(self):
+		running = True
+		while running:
+			for event in pygame.event.get():
+				if event.type == QUIT:
+					running = False
+			if self.mainScreen:
+				self.reset(0,3)
+				self.screen.blit(self.background, (0,0))
+			#elif self.startGame:
+				#currentTime = time.get_ticks()
+
+			display.update()
+		pygame.quit ()
+
+
+if __name__ == '__main__':
+	game = StartGame()
+	game.main()
+
 #class enemies():
 
 #class biggerEnemies():
