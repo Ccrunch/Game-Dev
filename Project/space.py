@@ -39,8 +39,8 @@ import sys
 #// globals
 
 SCREEN = display.set_mode((800,600))
-PicName = ["motherShip"]
-pictures = {name: image.load("images/{}.png".format(name)).convert_alpha() for name in PicName}
+PICNAME = ["motherShip"]
+PICTURES = {name: image.load("images/{}.png".format(name)).convert_alpha() for name in PicName}
 
 
 
@@ -48,7 +48,7 @@ pictures = {name: image.load("images/{}.png".format(name)).convert_alpha() for n
 class MotherShip(sprite.Sprite):
 	def __init__(self):
 		sprite.Sprite.__init__(self)
-		self.image = pictures["motherShip"]
+		self.image = PICTURES["motherShip"]
 		self.rect = self.image.get_rect(topleft=(375,540))
 		self.speed = 5
 
@@ -63,7 +63,7 @@ class MotherShip(sprite.Sprite):
 class Bullet(sprite.Sprite):
 	def __init__(self, xpos, ypos, direction, speed, filename, side):
 		sprite.Sprite.__init__(self)
-		self.image = pictures[filename]
+		self.image = PICTURES[filename]
 		self.rect = self.image.get_rect(topleft=(xpos, ypos))
 		self.speed = speed
 		self.direction = direction
@@ -79,8 +79,45 @@ class Bullet(sprite.Sprite):
 
 class block(sprite.Sprite):
 
+	def __init__(self,size,color, row, column):
+		sprite.Sprite.__init__(self)
+		self.height = size
+		self.width = size
+		self.color = color
+		self.image = Surface((self.width, self.height))
+		self.image.fill(self.color)
+		self.rect = self.image.get_rect()
+		self.row = row
+		self.column = column
+
 	def update(self, keys, *args):
 		game.screen.blit(self.image, self.rect)
+
+#class Mystery(sprite.Sprite):
+# Collisions is the same as "class Explosion"
+class Collision(sprite.Sprite):
+	#x = xpos,   y = ypos
+	def __init__(self, x, y, row, ship, mystery, score):
+		sprite.Sprite.__init__(self)
+		self.isMothership = ship
+		self.isMystery = mystery
+		if mystery:
+			self.text = Text(FONT, 20, str(score), WHITE, x+20, y+6)
+		elif ship:
+			self.image = PICTURES["motherShip"]
+			self.rect = self.image.get_rect(topleft=(x,y))
+		else:
+			self.row = row
+			self.load_image()
+			self.image = transform.scale(self.image, (40, 35))
+			self.rect = self.image.get_rect(topleft=(x,y))
+			game.screen.blit(self.image, self.rect)
+
+		#self.timer = time.get_ticks()
+
+	def update(self, keys, currentTime):
+		
+
 
 # // not done with this class 
 class StartGame(object):
