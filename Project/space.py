@@ -138,6 +138,34 @@ class Collision(sprite.Sprite):
 
 		
 
+class Enemies(sprite.Sprite):
+
+	def __init__(self, row, column):
+		sprite.Sprite.__init__(self)
+		self.row = row
+		self.column = column
+		self.images = []
+		self.load_images()
+		self.index = 0
+		self.image = self.images[self.index]
+		self.rect = self.image.get_rect()
+		self.direction = 1
+		self.leftMoves = 30
+		self.rightMoves = 15
+		self.moveTime = 600
+		self.moveNumber = 0
+		self.firstTime = True
+		self.movedY = False
+		self.columns = [False] * 10
+		self.aliveColumns = [True] * 10
+		self.addRightMoves = False
+		self.addLeftMoves = False
+		self.numOfRightMoves = 0
+		self.numOfLeftMoves = 0
+		self.timer = time.get_ticks()
+
+		
+
 
 # // not done with this class 
 class StartGame(object):
