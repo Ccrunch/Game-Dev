@@ -39,8 +39,8 @@ import sys
 #// globals
 
 SCREEN = display.set_mode((800,600))
-PICNAME = ["motherShip"]
-PICTURES = {name: image.load("images/{}.png".format(name)).convert_alpha() for name in PicName}
+PICNAME = ["motherShip","bullet", "enemy_A", "enemy_B", "enemy_C", "explosion_all", "boss_fight"]
+PICTURES = {name: image.load("images/{}.png".format(name)).convert_alpha() for name in PICNAME}
 
 
 
@@ -77,6 +77,7 @@ class Bullet(sprite.Sprite):
 		if self.rect.y < 15 or self.rect.y > 600:
 			self.kill()
 
+#block = blocker
 class block(sprite.Sprite):
 
 	def __init__(self,size,color, row, column):
@@ -93,7 +94,7 @@ class block(sprite.Sprite):
 	def update(self, keys, *args):
 		game.screen.blit(self.image, self.rect)
 
-#class Mystery(sprite.Sprite):
+#class Mystery(sprite.Sprite): == class boss_fight(sprite.Sprite)
 # Collisions is the same as "class Explosion"
 class Collision(sprite.Sprite):
 	#x = xpos,   y = ypos
@@ -113,9 +114,28 @@ class Collision(sprite.Sprite):
 			self.rect = self.image.get_rect(topleft=(x,y))
 			game.screen.blit(self.image, self.rect)
 
-		#self.timer = time.get_ticks()
+		self.timer = time.get_ticks()
 
 	def update(self, keys, currentTime):
+		if self.isMothership:
+			if currentTime - self.timer > 300 and currentTime - self.timer <= 600:
+				game.screen.blit(self.image, self.rect)
+			if currentTime - self.timer > 900:
+				self.kill()
+
+		else:
+			if currentTime - self.timer <= 100:
+				game.screen.blit(self.image, self.rect)
+			if currentTime - self.timer > 100 and currentTime - self.timer <= 200:
+				self.image - transform.scale(self.image, (50, 45))
+				game.screen.blit(self.image, (self.rect.x-6, self.rect.y-6))
+			if currentTime - self.timer > 400:
+				self.kill()
+
+	def load_image(self):
+		imgColors = ["_all"]
+		self.image = PICTURES["explosion{}".format(imgColors[self.row])]
+
 		
 
 
