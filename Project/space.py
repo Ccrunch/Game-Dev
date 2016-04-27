@@ -116,6 +116,7 @@ class Collision(sprite.Sprite):
 
 		self.timer = time.get_ticks()
 
+	# need the mistery part in here
 	def update(self, keys, currentTime):
 		if self.isMothership:
 			if currentTime - self.timer > 300 and currentTime - self.timer <= 600:
@@ -164,7 +165,83 @@ class Enemies(sprite.Sprite):
 		self.numOfLeftMoves = 0
 		self.timer = time.get_ticks()
 
-		
+	def check_column_deletion(self, deadRow, deadColumn, deadArray):
+		if deadRow != -1 and deadColumn != -1:
+			deadArray[deadRow][deadColumn] = 1
+			for column in range(10):
+				if all([deadArray[row][column] == 1 for row in range(5)]):
+					self.columns[column] = True
+
+		for i in range(5):
+			if all([self.columns[x] for x in range(i + 1)]) and self.aliveColumns[i]:
+				self.leftMoves += 5
+				self.aliveColumns[i] = False
+				if self.direction == -1:
+					self.rightMoves += 5
+				else:
+					self.addRightMoves = True
+					self.addLeftMoves += 5
+
+		for i in range(5):
+			if all([self.columns[x] for x in range(9, 8 - i, -1)]) and self.aliveColumns[9 - i]:
+				self.aliveColumns[9 - i] = False
+				self.rightMoves += 5
+				if self.direction == 1:
+					self.leftMoves += 5
+				else:
+					self.addLeftMoves = True
+					self.numOfLeftMoves += 5
+
+	#deadRow, deadColumn, deadArray == killedRow...
+	def update(self, keys, currentTime, deadRow, deadColumn, deadArray):
+		self.check_column_deletion(deadRow, deadColumn, deadArray)
+		if currentTime - self.timer > self.moveTime:
+			self.movedY = False
+			if self.moveNumber >= self.rightMoves and self.direction == -1:
+				self.direction *= -1
+				self.moveNumber = 0
+				self.rect.y += 35
+				self.movedY = True
+				if self.addRightMoves:
+					self.rightMoves += self.numOfRightMoves
+				if self.firstTime:
+					self.rightMoves = self.leftMoves
+					self.firstTime = False
+				self.addRightMovesAfterDrop = False
+			if self.moveNumber >= self.leftMoves and self.direction == -1:
+				self.direction *= -1
+				self.moveNumber = 0
+				self.rect.y += 35
+				self.movedY = True
+				if self.addLeftMoves:
+					self.leftMoves += self.numOfLeftMoves
+				self.addLeftMovesAfterDrop = False
+			if self.moveNumber < self.rightMoves and self.direction == 1 and not self.movedY:
+				self.rect.x += 10
+				self.moveNumber += 1
+			if self.moveNumber < self.leftMoves and self.direction == -1 and not self.movedY:
+				self.rect.x -= 10
+				self.moveNumber += 1
+
+			self.index += 1
+			if self.index >= len(self.images):
+				self.index = 0
+			self.image = self.images[self.index]
+
+			self.timer += self.moveTime
+		game.screen.blit(self.images, self.rect)
+
+	def loadImages(self):
+		images = {0: ["_A", "_A"],
+				  1: ["_B", "_B"],
+				  2: ["_C", "_C"],
+				  3: ["_C", "_C"],
+				  4: ["_A", "_A"],
+				 }
+		img1, img2 = (PICTURES["enemy{}".format(img_num)] for img_num in images[self.row])
+		self.images.append(transform.scale(img1, (40, 35)))
+		self.images.append(transform.scale(img2, (40, 35)))
+
 
 
 # // not done with this class 
@@ -176,9 +253,34 @@ class StartGame(object):
 		self.startGame = False
 		self.mainScreen = True
 		self.gameOver = False
+		self.enemyposition = 65
 
 	def reset(self, score, lives):
 		self.player = MotherShip()
+		self.playerGroup = sprite.Group(self.player)
+		self.explosionGroup = sprite.Group()
+		self.mysteryShip = Mystery() #have to change this to boss fight or something
+		self.mysteryGroup = sprite.Group(self.mysteryShip)
+		self.enemyBullets = sprite.Group()
+		self.reset_lives()
+		self.make_enemies()
+		self.allBlockers = sprite.Group(self.make_blockers(0), self.make_blockers(1), self.make_blockers(2), self.make_blockers(3))
+		self.keys = key.get_pressed()
+		self.clock = time.Clock()
+		self.timer = time.get_ticks()
+		self.noteTimer = time.get_ticks()
+		self.shipTimer = time.get_ticks()
+		self.score = score
+		self.lives = lives
+		self.create_audio()
+		self.create_text()
+		self.killedRow = -1
+		self.killedColumn = -1
+		self.makeNewShip = False
+		self.shipAlive = True
+		self.killedArray = [[0] * 10 for x in range(5)]
+
+
 
 	def main(self):
 		running = True
