@@ -95,14 +95,40 @@ class block(sprite.Sprite):
 		game.screen.blit(self.image, self.rect)
 
 #class Mystery(sprite.Sprite): == class boss_fight(sprite.Sprite)
+class boss_fight(sprite.Sprite):
+	def __init__(self):
+		sprite.Sprite.__init__(self)
+		self.image = PICTURES["boss_fight"]
+		self.image = transform.scale(self.image, (75, 35))
+		self.rect = self.image.get_rect(topleft=(-80, 45))
+		self.row = 5
+		self.moveTime = 25000
+		self.direction = 1
+		self.timer = time.get_ticks()
+
+	def update(self, keys, currentTime, *args):
+		resetTimer = False
+		if (currentTime - self.timer > self.moveTime) and self.rect.x < 840 and self.direction == 1:
+			self.rect.x += 2
+			game.screen.blit(self.image, self.rect)
+		if (currentTime - self.timer > self.moveTime) and self.rect.x > -100 and self.direction == -1:
+			self.rect.x -= 2
+			game.screen.blit(self.image, self.rect)
+		if (self.rect.x > 830):
+			self.direction = -1
+		if (self.rect.x < -90):
+			self.direction = 1
+			resetTimer = True
+		if (currentTime - self.timer > self.moveTime) and resetTimer:
+			self.timer = currentTime
 # Collisions is the same as "class Explosion"
 class Collision(sprite.Sprite):
 	#x = xpos,   y = ypos
-	def __init__(self, x, y, row, ship, mystery, score):
+	def __init__(self, x, y, row, ship, boss, score):
 		sprite.Sprite.__init__(self)
 		self.isMothership = ship
-		self.isMystery = mystery
-		if mystery:
+		self.isBoss = boss
+		if boss:
 			self.text = Text(FONT, 20, str(score), WHITE, x+20, y+6)
 		elif ship:
 			self.image = PICTURES["motherShip"]
@@ -118,6 +144,14 @@ class Collision(sprite.Sprite):
 
 	# need the mistery part in here
 	def update(self, keys, currentTime):
+		if self.isBoss:
+			if currentTime - self.timer <= 200:
+				self.text.draw(game.screen)
+			if currentTime - self.timer > 400 and currentTime - self.timer <= 600:
+				self.text.draw(game.screen)
+			if currentTime - self.timer > 600:
+				self.kill()
+
 		if self.isMothership:
 			if currentTime - self.timer > 300 and currentTime - self.timer <= 600:
 				game.screen.blit(self.image, self.rect)
@@ -137,7 +171,15 @@ class Collision(sprite.Sprite):
 		imgColors = ["_all"]
 		self.image = PICTURES["explosion{}".format(imgColors[self.row])]
 
-		
+	
+class Text(object):
+	def __init__(self, textFont, size, message, color, xpos, ypos):
+		self.font = font.Font(textFont, size)
+		self.surface = self.font.render(message, True, color)
+		self.rect = self.surface.get_rect(topleft=(xpos, ypos))
+
+	def draw(self, surface):
+		surface.blit(self.surface, self.rect)
 
 class Enemies(sprite.Sprite):
 
