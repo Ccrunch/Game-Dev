@@ -61,10 +61,10 @@ class MotherShip(sprite.Sprite):
 		game.screen.blit(self.image, self.rect)
 
 class Bullet(sprite.Sprite):
-	def __init__(self, xpos, ypos, direction, speed, filename, side):
+	def __init__(self, x, y, direction, speed, filename, side):
 		sprite.Sprite.__init__(self)
 		self.image = PICTURES[filename]
-		self.rect = self.image.get_rect(topleft=(xpos, ypos))
+		self.rect = self.image.get_rect(topleft=(x, y))
 		self.speed = speed
 		self.direction = direction
 		self.side = side
@@ -123,7 +123,6 @@ class boss_fight(sprite.Sprite):
 			self.timer = currentTime
 # Collisions is the same as "class Explosion"
 class Collision(sprite.Sprite):
-	#x = xpos,   y = ypos
 	def __init__(self, x, y, row, ship, boss, score):
 		sprite.Sprite.__init__(self)
 		self.isMothership = ship
@@ -234,6 +233,7 @@ class Enemies(sprite.Sprite):
 					self.addLeftMoves = True
 					self.numOfLeftMoves += 5
 
+
 	#deadRow, deadColumn, deadArray == killedRow...
 	def update(self, keys, currentTime, deadRow, deadColumn, deadArray):
 		self.check_column_deletion(deadRow, deadColumn, deadArray)
@@ -285,6 +285,17 @@ class Enemies(sprite.Sprite):
 		self.images.append(transform.scale(img2, (40, 35)))
 
 
+class LIVES(sprite.Sprite):
+	def __init__(self, x, y):
+		sprite.Sprite.__init__(self)
+		self.image = PICTURES["motherShip"]
+		self.image = transform.scale(self.image, (23, 23))
+		self.rect = self.image.get_rect(topleft=(x, y))
+		
+	def update(self, keys, *args):
+		game.screen.blit(self.image, self.rect)
+
+
 
 # // not done with this class 
 class StartGame(object):
@@ -301,12 +312,12 @@ class StartGame(object):
 		self.player = MotherShip()
 		self.playerGroup = sprite.Group(self.player)
 		self.explosionGroup = sprite.Group()
-		self.mysteryShip = Mystery() #have to change this to boss fight or something
-		self.mysteryGroup = sprite.Group(self.mysteryShip)
+		self.bossShip = boss_fight() #have to change this to boss fight or something
+		self.bossGroup = sprite.Group(self.bossShip)
 		self.enemyBullets = sprite.Group()
-		self.reset_lives()
-		self.make_enemies()
-		self.allBlockers = sprite.Group(self.make_blockers(0), self.make_blockers(1), self.make_blockers(2), self.make_blockers(3))
+		#self.reset_lives()
+		#self.make_enemies()
+		#self.allBlockers = sprite.Group(self.make_blockers(0), self.make_blockers(1), self.make_blockers(2), self.make_blockers(3))
 		self.keys = key.get_pressed()
 		self.clock = time.Clock()
 		self.timer = time.get_ticks()
@@ -314,14 +325,35 @@ class StartGame(object):
 		self.shipTimer = time.get_ticks()
 		self.score = score
 		self.lives = lives
-		self.create_audio()
-		self.create_text()
+		#self.create_audio()
+		#self.create_text()
 		self.killedRow = -1
 		self.killedColumn = -1
 		self.makeNewShip = False
 		self.shipAlive = True
 		self.killedArray = [[0] * 10 for x in range(5)]
 
+
+	def make_lives(self):
+		self.life1 = LIVES(715, 3)
+		self.life2 = LIVES(742, 3)
+		self.life3 = LIVES(769, 3)
+		self.life4 = LIVES(796, 3)
+		self.life5 = LIVES(823, 3)
+		self.livesGroup = sprite.Group(self.life1, self.life2, self.life3, self.life4, self.life5)
+
+	def make_blockers(self, number):
+	   blockerGroup = sprite.Group()
+	   for row in range(4):
+		   for column in range(9):
+			   blocker = Blocker(10, GREEN, row, column)
+			   blocker.rect.x = 50 + (200 * number) + (column * blocker.width)
+			   blocker.rect.y = 450 + (row * blocker.height)
+			   blockerGroup.add(blocker)
+	   return blockerGroup
+
+
+	#create text is next
 
 
 	def main(self):
