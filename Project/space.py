@@ -34,7 +34,9 @@ Possible classes
 """
 import pygame
 from pygame import *
+from pygame.locals import *
 import sys
+from random import shuffle, randrange, choice
 
 #// globals
 
@@ -42,7 +44,13 @@ SCREEN = display.set_mode((800,600))
 PICNAME = ["motherShip","bullet", "enemy_A", "enemy_B", "enemy_C", "explosion_all", "boss_fight"]
 PICTURES = {name: image.load("images/{}.png".format(name)).convert_alpha() for name in PICNAME}
 
-
+WHITE 	= (255, 255, 255)
+GREEN 	= (78, 255, 87)
+YELLOW 	= (241, 255, 0)
+BLUE 	= (80, 255, 239)
+PURPLE 	= (203, 0, 255)
+RED 	= (237, 28, 36)
+FONTS = "game-font-7/game_font_7.ttf"
 
 
 class MotherShip(sprite.Sprite):
@@ -128,7 +136,7 @@ class Collision(sprite.Sprite):
 		self.isMothership = ship
 		self.isBoss = boss
 		if boss:
-			self.text = Text(FONT, 20, str(score), WHITE, x+20, y+6)
+			self.text = Text(FONTS, 20, str(score), WHITE, x+20, y+6)
 		elif ship:
 			self.image = PICTURES["motherShip"]
 			self.rect = self.image.get_rect(topleft=(x,y))
@@ -312,10 +320,11 @@ class StartGame(object):
 		self.player = MotherShip()
 		self.playerGroup = sprite.Group(self.player)
 		self.explosionGroup = sprite.Group()
+		self.bullets = sprite.Group()
 		self.bossShip = boss_fight() #have to change this to boss fight or something
 		self.bossGroup = sprite.Group(self.bossShip)
 		self.enemyBullets = sprite.Group()
-		#self.reset_lives()
+		self.make_lives()
 		#self.make_enemies()
 		#self.allBlockers = sprite.Group(self.make_blockers(0), self.make_blockers(1), self.make_blockers(2), self.make_blockers(3))
 		self.keys = key.get_pressed()
@@ -326,7 +335,7 @@ class StartGame(object):
 		self.score = score
 		self.lives = lives
 		#self.create_audio()
-		#self.create_text()
+		self.make_text()
 		self.killedRow = -1
 		self.killedColumn = -1
 		self.makeNewShip = False
@@ -354,6 +363,37 @@ class StartGame(object):
 
 
 	#create text is next
+	def make_text(self):
+		self.title = Text(FONTS, 50, "Game Dev Project", WHITE, 164, 155)
+		self.gameOver = Text(FONTS, 50, "Game Over", WHITE, 250, 270)
+		self.nextRound = Text(FONTS, 50, "Next Round", WHITE, 240, 270)
+		self.enemyA = Text(FONTS, 25, "   =   10 pts", GREEN, 368, 270)
+		self.enemyB = Text(FONTS, 25, "   =  20 pts", BLUE, 368, 320)
+		self.enemyC = Text(FONTS, 25, "   =  30 pts", PURPLE, 368, 370)
+		self.enemyBoss = Text(FONTS, 25, "   =  ?????", RED, 368, 420)
+		self.score = Text(FONTS, 20, "Score", WHITE, 5, 5)
+		self.lives = Text(FONTS, 20, "Lives ", WHITE, 640, 5)
+
+	def userInput(self):
+		self.keys = key.get_pressed()
+		for i in event.get():
+			if i.type == QUIT:
+				sys.exit()
+			if i.type == KEYDOWN:
+				if i.key == K_SPACE:
+					if len(self.bullets) == 0 and self.shipAlive:
+						if self.score < 1000:
+							bullet = Bullet(self.player.rect.x + 23, self.player.rect.y +5, -1, 15, "bullet", "center")
+							self.bullets.add(bullet)
+							self.allSprites.add(self.bullets)
+						else:
+							leftbullet = Bullet(self.player.rect.x + 8, self.player.rect.y + 5, -1, 15, "bullet", "left")
+							rightbullet = Bullet(self.player.rect.c + 38, self.player.rect.y + 5, -1, 15, "bullet", "right")
+							self.bullets.add(leftbullet)
+							self.bullets.add(rightbullet)
+							self.allSprites.add(self.bullets)
+
+
 
 
 	def main(self):
